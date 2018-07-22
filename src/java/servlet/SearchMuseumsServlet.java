@@ -11,16 +11,14 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
-@WebServlet(name = "ShowMuzeumsServlet", value = "/showMuzeums")
-public class ShowMuzeumsServlet extends HttpServlet {
+@WebServlet(name = "SearchMuseumsServlet", value = "/searchMuzeums")
+public class SearchMuseumsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("poszło get z /searchMuzeums");
         request.setCharacterEncoding("UTF-8");
-        request.setAttribute("fromServletHeader", "SHOW Museums - report");
+        String szukam = request.getParameter("tegoSzukaj");
+        System.out.println(szukam);
+        request.setAttribute("tegoSzukaj", szukam);
+        request.setAttribute("fromServletHeader", szukam);
         Connection connection = null;
         PreparedStatement select = null;
         ResultSet results = null;
@@ -28,7 +26,8 @@ public class ShowMuzeumsServlet extends HttpServlet {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:/sqlite/Muzea.db");
-            select = connection.prepareStatement("select * from museums;");
+            select = connection.prepareStatement("select * from museums where miasto=?");
+            select.setString(1, szukam);
             results = select.executeQuery();
             while (results.next()) {
                 Muzeum muzeum = new Muzeum(
@@ -56,9 +55,15 @@ public class ShowMuzeumsServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            request.setAttribute("muzeums", muzeumsArrayList);
+            request.getRequestDispatcher("/WEB-INF/showMuzeums.jsp").forward(request, response);
         }
+    }
 
-        request.setAttribute("muzeums", muzeumsArrayList);
-        request.getRequestDispatcher("/WEB-INF/showMuzeums.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("poszło get z /searchMuzeums");
+        request.setCharacterEncoding("UTF-8");
+        request.setAttribute("fromServletHeader", "SEARCH Museums");
+        request.getRequestDispatcher("/WEB-INF/searchMuzeums.jsp").forward(request, response);
     }
 }
