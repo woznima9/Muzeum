@@ -15,10 +15,12 @@ import java.util.ArrayList;
 public class SearchMuseumsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String szukam = request.getParameter("tegoSzukaj");
-        System.out.println(szukam);
-        request.setAttribute("tegoSzukaj", szukam);
-        request.setAttribute("fromServletHeader", szukam);
+        String szukamMiasta = request.getParameter("miastaSzukaj");
+        String szukamUlicy = request.getParameter("ulicySzukaj");
+        System.out.println(szukamMiasta);
+        request.setAttribute("miastaSzukaj", szukamMiasta);
+        request.setAttribute("szukajUlicy", szukamUlicy);
+        request.setAttribute("fromServletHeader", szukamMiasta);
         Connection connection = null;
         PreparedStatement select = null;
         ResultSet results = null;
@@ -26,8 +28,9 @@ public class SearchMuseumsServlet extends HttpServlet {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:/sqlite/Muzea.db");
-            select = connection.prepareStatement("select * from museums where miasto=?");
-            select.setString(1, szukam);
+            select = connection.prepareStatement("select * from museums where miasto like ? or ulica like ?");
+            select.setString(1, szukamMiasta);
+            select.setString(2, szukamUlicy);
             results = select.executeQuery();
             while (results.next()) {
                 Muzeum muzeum = new Muzeum(

@@ -17,7 +17,7 @@
 <%--<p>${requestScope.tegoSzukaj}</p>--%>
 <p>Znalezione MUZEA:</p>
 <c:forEach items="${requestScope.muzeums}" var="muzeum">
-    <p>${muzeum.getId()} ${muzeum.getNazwa()} ${muzeum.getMiasto()}</p>
+    <p>${muzeum.getId()} ${muzeum.getNazwa()} ${muzeum.getMiasto()} ${muzeum.getUlica()}</p>
 </c:forEach>
 
 </body>
